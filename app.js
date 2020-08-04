@@ -45,7 +45,7 @@ async function publishMessage(id, text) {
   var j = schedule.scheduleJob(rule, function() {
     axios
       .post(
-        "https://webhooks.mongodb-realm.com/api/client/v2.0/app/dailygoalstash-onuox/service/slack/incoming_webhook/deleteAll",
+        process.env.MONGO_DELETE_ENDPOINT,
         {}
       )
       .then(function(response) {
@@ -73,7 +73,7 @@ async function publishMessage(id, text) {
 app.event("app_home_opened", async ({ event, context }) => {
   try {
     const response = await axios.post(
-      "https://webhooks.mongodb-realm.com/api/client/v2.0/app/dailygoalstash-onuox/service/slack/incoming_webhook/currentGoals"
+      process.env.MONGO_LIST_ENDPOINT
     );
 
     var dailyGoals = response.data.text;
@@ -136,7 +136,7 @@ app.action({}, async ({ action, ack }) => {
   if (payload.includes("clear_daily_goals")) {
     axios
       .post(
-        "https://webhooks.mongodb-realm.com/api/client/v2.0/app/dailygoalstash-onuox/service/slack/incoming_webhook/deleteAll",
+        process.env.MONGO_DELETE_ENDPOINT,
         {}
       )
       .then(function(response) {
