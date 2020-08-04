@@ -1,15 +1,30 @@
-Bolt app template
+Daily Goals Bot
 =================
 
-[Bolt](https://slack.dev/bolt) is our framework that lets you build JavaScript-based Slack apps in a flash.
+While I was working in an agile environment, my team realized we often forgot to write out what our goals for the day were in the team's Slack channel. Sometimes, we even forgot to define what our goal for the day would be!
 
-This project is a simple app template to make it easy to create your first Bolt app. Read our [Getting Started with Bolt](https://api.slack.com/start/building/bolt) guide for a more in-depth tutorial
+I decided to take the opportunity to learn the basics of working with Slack's API and build a simple bot.
 
-Your Project
+Features
 ------------
 
-- `app.js` contains the primary Bolt app. It imports the Bolt package (`@slack/bolt`) and starts the Bolt app's server. It's where you'll add your app's listeners.
-- `.env` is where you'll put your Slack app's authorization token and signing secret.
+* Every day, at midnight, a recurring job cleans all daily goals.
+* Every day, at 11 am, a recurring job sends a message to our team channel (defined in an environment variable) reminding us to add the day's daily goals.
+* Three slash commands are supported: /addgoal, /currentgoals, and /clearall.
+* The added daily goals are persisted in a MongoDB instance with webhooks. You can get a free instance for a homebrew bot [here](https://www.mongodb.com/realm). 
+* The app also has a home view that lists all current goals and allows you to clear all the current goals.
+
+Built with
+------------
+
+[Bolt](https://slack.dev/bolt) is Slack's framework that lets you build JavaScript-based Slack apps in a flash.
+
+
+Structure
+------------
+
+- `app.js` contains the primary Bolt app. It imports the Bolt package (`@slack/bolt`) and starts the Bolt app's server. It's where I added my app's listeners.
+- `.env` is where I put my Slack app's authorization token and signing secret. It's not part of the code in the repository.
 - The `examples/` folder contains a couple of other sample apps that you can peruse to your liking. They show off a few platform features that your app may want to use.
 
 
@@ -20,3 +35,5 @@ Read the [Bolt documentation](https://slack.dev/bolt)
 -------------------
 
 \ ゜o゜)ノ
+
+Built by João Cachada
