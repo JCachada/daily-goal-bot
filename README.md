@@ -39,6 +39,8 @@ You can find an example `.env` file in `.env.example`.
 
 `shrinkwrap.yaml` defines the versions for the dependencies the app uses, to make sure that no unexpected conflicts appear.
 
+`.commitlintrc.json` extends the rules from [Conventional Commits](https://www.conventionalcommits.org/) to make sure that every commit follows a defined standard.
+
 Structure
 ------------
 
