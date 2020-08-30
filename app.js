@@ -30,12 +30,9 @@ async function publishMessage(channelId, text) {
 }
 
 (async () => {
-  // Start your app
   await app.start(process.env.PORT || 3000);
 
-  console.log('⚡️ Bolt app is running!');
-
-  // Delete all goals at midnight
+  console.log('⚡️ App is running!');
 
   const deleteRule = new RecurrenceRule();
   deleteRule.dayOfWeek = [0, new Range(1, 6)];
@@ -56,8 +53,6 @@ async function publishMessage(channelId, text) {
         });
   });
 
-  // Ping about daily goals
-
   const pingRule = new RecurrenceRule();
   pingRule.dayOfWeek = [0, new Range(1, 6)];
   pingRule.hour = 10;
@@ -69,8 +64,6 @@ async function publishMessage(channelId, text) {
         'Have you added your daily goals for today? ' +
         'If not, use /addgoal to do it!');
   });
-
-  // publishMessage(process.env.CHANNEL_NAME, "Hello world :tada:");
 })();
 
 app.event('app_home_opened', async ({event, context}) => {
@@ -82,18 +75,14 @@ app.event('app_home_opened', async ({event, context}) => {
     const dailyGoals = response.data.text;
 
     await app.client.views.publish({
-      /* retrieves your xoxb token from context */
       token: context.botToken,
 
-      /* the user that opened your app's app home */
       user_id: event.user,
 
-      /* the view payload that appears in the app home*/
       view: {
         type: 'home',
         callback_id: 'home_view',
 
-        /* body of the view */
         blocks: [
           {
             type: 'divider',
@@ -129,7 +118,6 @@ app.event('app_home_opened', async ({event, context}) => {
   }
 });
 
-// Listen for dialog submission, or legacy action
 app.action({}, async ({action, ack}) => {
   await ack();
 
