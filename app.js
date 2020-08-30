@@ -1,10 +1,10 @@
-// Require the Bolt package (github.com/slackapi/bolt)
+/* eslint-disable max-len */
 
-import {App} from '@slack/bolt';
+const {App} = require('@slack/bolt');
 
-import axios from 'axios';
+const axios = require('axios').default;
 
-import {RecurrenceRule, Range, scheduleJob} from 'node-schedule';
+require('node-schedule');
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
@@ -12,22 +12,17 @@ const app = new App({
 });
 
 /**
- * Adds two numbers together.
+ * Publishes a message to the defined slack channel.
  * @param {text} channelId The name of the channel to publish a message in.
  * @param {text} text The message to publish..
  */
 async function publishMessage(channelId, text) {
   try {
-    // Call the chat.postMessage method using the built-in WebClient
     const result = await app.client.chat.postMessage({
-      // The token you used to initialize your app
       token: process.env.SLACK_BOT_TOKEN,
       channel: channelId,
       text: text,
-      // You could also use a blocks[] array to send richer content
     });
-
-    // Print result, which includes information about the message (like TS)
     console.log(result);
   } catch (error) {
     console.error(error);
@@ -107,7 +102,9 @@ app.event('app_home_opened', async ({event, context}) => {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: 'Welcome to the daily goals app! \n \n You can use the following commands: \n \n /addgoal [text]: adds a goal. Please include the @ of the person assigned to the goal (for instance, @joao.cachada). \n \n /clearAll: deletes all current daily goals. \n \n /currentgoals: shows all active daily goals. \n \n' + dailyGoals,
+              text: 'Welcome to the daily goals app! \n \n You can use the following commands: \n \n /addgoal [text]: adds a goal.' +
+              ' Please include the @ of the person assigned to the goal (for instance, @joao.cachada). \n '+
+              '\n /clearAll: deletes all current daily goals. \n \n /currentgoals: shows all active daily goals. \n \n' + dailyGoals,
             },
           },
           {
