@@ -1,24 +1,29 @@
 // Require the Bolt package (github.com/slackapi/bolt)
 
-const { App } = require("@slack/bolt");
+import {App} from '@slack/bolt';
 
-const axios = require("axios").default;
+import axios from 'axios';
 
-var schedule = require("node-schedule");
+import {RecurrenceRule, Range, scheduleJob} from 'node-schedule';
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
-  signingSecret: process.env.SLACK_SIGNING_SECRET
+  signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-async function publishMessage(id, text) {
+/**
+ * Adds two numbers together.
+ * @param {text} channelId The name of the channel to publish a message in.
+ * @param {text} text The message to publish..
+ */
+async function publishMessage(channelId, text) {
   try {
     // Call the chat.postMessage method using the built-in WebClient
     const result = await app.client.chat.postMessage({
       // The token you used to initialize your app
       token: process.env.SLACK_BOT_TOKEN,
-      channel: id,
-      text: text
+      channel: channelId,
+      text: text,
       // You could also use a blocks[] array to send richer content
     });
 
@@ -33,53 +38,55 @@ async function publishMessage(id, text) {
   // Start your app
   await app.start(process.env.PORT || 3000);
 
-  console.log("⚡️ Bolt app is running!");
-  
+  console.log('⚡️ Bolt app is running!');
+
   // Delete all goals at midnight
-  
-  var rule = new schedule.RecurrenceRule();
-  rule.dayOfWeek = [0, new schedule.Range(1, 6)];
-  rule.hour = 0;
-  rule.minute = 1;
 
-  var j = schedule.scheduleJob(rule, function() {
+  const deleteRule = new RecurrenceRule();
+  deleteRule.dayOfWeek = [0, new Range(1, 6)];
+  deleteRule.hour = 0;
+  deleteRule.minute = 1;
+
+  scheduleJob(deleteRule, function() {
     axios
-      .post(
-        process.env.MONGO_DELETE_ENDPOINT,
-        {}
-      )
-      .then(function(response) {
-        console.log("Cleared daily goals for the day.");
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+        .post(
+            process.env.MONGO_DELETE_ENDPOINT,
+            {},
+        )
+        .then(function(response) {
+          console.log('Cleared daily goals for the day.');
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
   });
-  
-  // Ping about daily goals
-  
-  var rule = new schedule.RecurrenceRule();
-  rule.dayOfWeek = [0, new schedule.Range(1, 6)];
-  rule.hour = 10;
-  rule.minute = 0;
 
-  var j = schedule.scheduleJob(rule, function() {
-    publishMessage(process.env.CHANNEL_NAME, "Have you added your daily goals for today? If not, use /addgoal to do it!")
+  // Ping about daily goals
+
+  const pingRule = new RecurrenceRule();
+  pingRule.dayOfWeek = [0, new Range(1, 6)];
+  pingRule.hour = 10;
+  pingRule.minute = 0;
+
+  scheduleJob(deleteRule, function() {
+    publishMessage(
+        process.env.CHANNEL_NAME,
+        'Have you added your daily goals for today? ' +
+        'If not, use /addgoal to do it!');
   });
 
   // publishMessage(process.env.CHANNEL_NAME, "Hello world :tada:");
 })();
 
-app.event("app_home_opened", async ({ event, context }) => {
+app.event('app_home_opened', async ({event, context}) => {
   try {
     const response = await axios.post(
-      process.env.MONGO_LIST_ENDPOINT
+        process.env.MONGO_LIST_ENDPOINT,
     );
 
-    var dailyGoals = response.data.text;
+    const dailyGoals = response.data.text;
 
-    /* view.publish is the method that your app uses to push a view to the Home tab */
-    const result = await app.client.views.publish({
+    await app.client.views.publish({
       /* retrieves your xoxb token from context */
       token: context.botToken,
 
@@ -88,37 +95,37 @@ app.event("app_home_opened", async ({ event, context }) => {
 
       /* the view payload that appears in the app home*/
       view: {
-        type: "home",
-        callback_id: "home_view",
+        type: 'home',
+        callback_id: 'home_view',
 
         /* body of the view */
         blocks: [
           {
-            type: "divider"
+            type: 'divider',
           },
           {
-            type: "section",
+            type: 'section',
             text: {
-              type: "mrkdwn",
-              text: "Welcome to the daily goals app! \n \n You can use the following commands: \n \n /addgoal [text]: adds a goal. Please include the @ of the person assigned to the goal (for instance, @joao.cachada). \n \n /clearAll: deletes all current daily goals. \n \n /currentgoals: shows all active daily goals. \n \n" + dailyGoals
-            }
+              type: 'mrkdwn',
+              text: 'Welcome to the daily goals app! \n \n You can use the following commands: \n \n /addgoal [text]: adds a goal. Please include the @ of the person assigned to the goal (for instance, @joao.cachada). \n \n /clearAll: deletes all current daily goals. \n \n /currentgoals: shows all active daily goals. \n \n' + dailyGoals,
+            },
           },
           {
-            type: "actions",
+            type: 'actions',
             elements: [
               {
-                type: "button",
+                type: 'button',
                 text: {
-                  type: "plain_text",
-                  text: "Delete all daily goals :octagonal_sign: ",
-                  emoji: true
+                  type: 'plain_text',
+                  text: 'Delete all daily goals :octagonal_sign: ',
+                  emoji: true,
                 },
-                value: "clear_daily_goals"
-              }
-            ]
-          }
-        ]
-      }
+                value: 'clear_daily_goals',
+              },
+            ],
+          },
+        ],
+      },
     });
   } catch (error) {
     console.error(error);
@@ -126,24 +133,24 @@ app.event("app_home_opened", async ({ event, context }) => {
 });
 
 // Listen for dialog submission, or legacy action
-app.action({}, async ({ action, ack }) => {
+app.action({}, async ({action, ack}) => {
   await ack();
 
-  var payload = JSON.stringify(action);
+  const payload = JSON.stringify(action);
 
   console.log(payload);
 
-  if (payload.includes("clear_daily_goals")) {
+  if (payload.includes('clear_daily_goals')) {
     axios
-      .post(
-        process.env.MONGO_DELETE_ENDPOINT,
-        {}
-      )
-      .then(function(response) {
-        console.log("Cleared daily goals for the day.");
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
+        .post(
+            process.env.MONGO_DELETE_ENDPOINT,
+            {},
+        )
+        .then(function(response) {
+          console.log('Cleared daily goals for the day.');
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
   }
 });

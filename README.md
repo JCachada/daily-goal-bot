@@ -20,6 +20,12 @@ Built with
 [Bolt](https://slack.dev/bolt) is Slack's framework that lets you build JavaScript-based Slack apps in a flash.
 
 
+Running the app
+------------
+
+- Clone the repository.
+- Run `npm install` in the repository folder to install dependencies.
+
 Structure
 ------------
 
