@@ -25,6 +25,19 @@ Running the app
 
 - Clone the repository.
 - Run `npm install` in the repository folder to install dependencies.
+- Configure your `.env` file. 
+- Run `npm start`
+
+Configuration files
+------------
+
+`.env` contains all the environment variables that shouldn't be part of version control. You need to fill all the variables in that file for the app to work. For how to get your slack tokens, check the [Slack Getting Started Guide](https://api.slack.com/start/building/bolt).
+
+You can find an example `.env` file in `.env.example`. 
+
+`eslintrc.json` contains all the style configurations. I used ESLint to keep a uniform style.
+
+`shrinkwrap.yaml` defines the versions for the dependencies the app uses, to make sure that no unexpected conflicts appear.
 
 Structure
 ------------
@@ -32,7 +45,6 @@ Structure
 - `app.js` contains the primary Bolt app. It imports the Bolt package (`@slack/bolt`) and starts the Bolt app's server. It's where I added my app's listeners.
 - `.env` is where I put my Slack app's authorization token and signing secret. It's not part of the code in the repository.
 - The `examples/` folder contains a couple of other sample apps that you can peruse to your liking. They show off a few platform features that your app may want to use.
-
 
 Read the [Getting Started guide](https://api.slack.com/start/building/bolt)
 -------------------
