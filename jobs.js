@@ -1,4 +1,4 @@
-require('node-schedule');
+const schedule = require('node-schedule');
 
 const axios = require('axios').default;
 
@@ -16,12 +16,12 @@ function setupJobs() {
  * Sets up a job that deletes leftover goals at midnight every day.
  */
 function setupDailyCleanUp() {
-  const deleteRule = new RecurrenceRule();
-  deleteRule.dayOfWeek = [0, new Range(1, 6)];
+  const deleteRule = new schedule.RecurrenceRule();
+  deleteRule.dayOfWeek = [0, new schedule.Range(1, 6)];
   deleteRule.hour = 0;
   deleteRule.minute = 1;
 
-  scheduleJob(deleteRule, function() {
+  schedule.scheduleJob(deleteRule, function() {
     axios
         .post(
             process.env.MONGO_DELETE_ENDPOINT,
@@ -40,12 +40,12 @@ function setupDailyCleanUp() {
  * Sets up a job that reminds the team to set their daily goals daily.
  */
 function setupDailyReminderPing() {
-  const pingRule = new RecurrenceRule();
-  pingRule.dayOfWeek = [0, new Range(1, 6)];
+  const pingRule = new schedule.RecurrenceRule();
+  pingRule.dayOfWeek = [0, new schedule.Range(1, 6)];
   pingRule.hour = 10;
   pingRule.minute = 0;
 
-  scheduleJob(pingRule, function() {
+  schedule.scheduleJob(pingRule, function() {
     helpers.publishMessage(
         'Have you added your daily goals for today? ' +
           'If not, use /addgoal to do it!');
