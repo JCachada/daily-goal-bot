@@ -45,7 +45,9 @@ Structure
 ------------
 
 - `app.js` contains the primary Bolt app. It imports the Bolt package (`@slack/bolt`) and starts the Bolt app's server. It's where I added my app's listeners.
-- `.env` is where I put my Slack app's authorization token and signing secret. It's not part of the code in the repository.
+- `jobs.js` is where my recurring jobs are configured. They're set up every time the app starts.
+- `helpers.js` is where I have functions that are useful across the app. For instance, it's where the function to publish a message in a Slack channel lives.
+- `.env.example` is where I put an example file for Slack app's authorization token and signing secret. The real .env file is not part of the code in the repository.
 - The `examples/` folder contains a couple of other sample apps that you can peruse to your liking. They show off a few platform features that your app may want to use.
 
 Read the [Getting Started guide](https://api.slack.com/start/building/bolt)
