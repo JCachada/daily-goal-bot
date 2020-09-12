@@ -35,6 +35,6 @@
     "eslint": "^7.7.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.20.6",
-    "husky": "latest"
+    "husky": "^4.3.0"
   }
 }
