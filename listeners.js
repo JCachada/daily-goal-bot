@@ -3,76 +3,93 @@ const app = require('./app');
 
 const axios = require('axios').default;
 
-app.app.event('app_home_opened', async ({event, context}) => {
-  try {
-    const response = await axios.post(
-        process.env.MONGO_LIST_ENDPOINT,
-    );
+/**
+ * Sets up the app's listeners.
+ */
+function setupListeners() {
+  setupAppHomeOpenedListener();
+  setupClearGoalsButtonListener();
+}
 
-    const dailyGoals = response.data.text;
+/**
+ * Sets up the behavior when the app home is opened.
+ */
+function setupAppHomeOpenedListener() {
+  app.app.event('app_home_opened', async ({event, context}) => {
+    try {
+      const response = await axios.post(process.env.MONGO_LIST_ENDPOINT);
 
-    await app.app.client.views.publish({
-      token: context.botToken,
+      const dailyGoals = response.data.text;
 
-      user_id: event.user,
+      await app.app.client.views.publish({
+        token: context.botToken,
 
-      view: {
-        type: 'home',
-        callback_id: 'home_view',
+        user_id: event.user,
 
-        blocks: [
-          {
-            type: 'divider',
-          },
-          {
-            type: 'section',
-            text: {
-              type: 'mrkdwn',
-              text: 'Welcome to the daily goals app! \n \n You can use the following commands: \n \n /addgoal [text]: adds a goal.' +
-                ' Please include the @ of the person assigned to the goal (for instance, @joao.cachada). \n '+
-                '\n /clearAll: deletes all current daily goals. \n \n /currentgoals: shows all active daily goals. \n \n' + dailyGoals,
+        view: {
+          type: 'home',
+          callback_id: 'home_view',
+
+          blocks: [
+            {
+              type: 'divider',
             },
-          },
-          {
-            type: 'actions',
-            elements: [
-              {
-                type: 'button',
-                text: {
-                  type: 'plain_text',
-                  text: 'Delete all daily goals :octagonal_sign: ',
-                  emoji: true,
-                },
-                value: 'clear_daily_goals',
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text:
+                  'Welcome to the daily goals app! \n \n You can use the following commands: \n \n /addgoal [text]: adds a goal.' +
+                  ' Please include the @ of the person assigned to the goal (for instance, @joao.cachada). \n ' +
+                  '\n /clearAll: deletes all current daily goals. \n \n /currentgoals: shows all active daily goals. \n \n' +
+                  dailyGoals,
               },
-            ],
-          },
-        ],
-      },
-    });
-  } catch (error) {
-    console.error(error);
-  }
-});
+            },
+            {
+              type: 'actions',
+              elements: [
+                {
+                  type: 'button',
+                  text: {
+                    type: 'plain_text',
+                    text: 'Delete all daily goals :octagonal_sign: ',
+                    emoji: true,
+                  },
+                  value: 'clear_daily_goals',
+                },
+              ],
+            },
+          ],
+        },
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+}
 
-app.action({}, async ({action, ack}) => {
-  await ack();
+/**
+ * Sets up the behavior when the "Clear All Goals" button is pressed.
+ */
+function setupClearGoalsButtonListener() {
+  app.app.action({}, async ({action, ack}) => {
+    await ack();
 
-  const payload = JSON.stringify(action);
+    const payload = JSON.stringify(action);
 
-  console.log(payload);
+    console.log(payload);
 
-  if (payload.includes('clear_daily_goals')) {
-    axios
-        .post(
-            process.env.MONGO_DELETE_ENDPOINT,
-            {},
-        )
-        .then(function(response) {
-          console.log('Cleared daily goals for the day.');
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-  }
-});
+    if (payload.includes('clear_daily_goals')) {
+      axios
+          .post(process.env.MONGO_DELETE_ENDPOINT, {})
+          .then(function(response) {
+            console.log('Cleared daily goals for the day.');
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+    }
+  });
+}
+
+module.exports.setupListeners = setupListeners;
